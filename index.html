@@ -3,622 +3,607 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>300PB 自动驾驶数据挖掘 - 下一代架构演示系统</title>
+    <title>300PB 自动驾驶数据挖掘 - 交互演示平台</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --bg-dark: #0f172a;
-            --bg-card: #1e293b;
-            --primary: #3b82f6;
-            --accent: #10b981;
-            --danger: #ef4444;
-            --text-main: #f1f5f9;
-            --text-sub: #94a3b8;
-            --code-bg: #0f1117;
+            --bg-dark: #0b1120;       /* 深蓝黑背景 */
+            --bg-card: #1e293b;       /* 卡片背景 */
+            --text-primary: #f8fafc;  /* 主标题白 */
+            --text-body: #94a3b8;     /* 正文灰 */
+            --brand-blue: #3b82f6;    /* 科技蓝 */
+            --brand-green: #10b981;   /* 成功绿 */
+            --brand-red: #ef4444;     /* 警告红 */
+            --gradient-title: linear-gradient(135deg, #60a5fa 0%, #34d399 100%);
         }
-
-        * { box-sizing: border-box; transition: all 0.3s ease; }
 
         body {
             margin: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background-color: var(--bg-dark);
-            color: var(--text-main);
+            color: var(--text-primary);
             overflow-x: hidden;
+            line-height: 1.7;
         }
 
-        /* --- 1. Hero 区域 (视频级 Canvas 背景) --- */
-        #hero-canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: 0;
-            opacity: 0.6;
+        /* --- 通用工具类 --- */
+        .highlight { color: var(--brand-blue); font-weight: bold; }
+        .danger { color: var(--brand-red); font-weight: bold; }
+        .success { color: var(--brand-green); font-weight: bold; }
+        .hidden { display: none !important; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* --- 1. 顶部 Hero (动态背景) --- */
+        #canvas-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            opacity: 0.4;
         }
 
-        .hero-section {
-            position: relative;
-            height: 100vh;
+        .hero {
+            height: 90vh;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            z-index: 1;
-            background: radial-gradient(circle at center, transparent 0%, var(--bg-dark) 100%);
+            padding: 0 20px;
+            background: radial-gradient(circle at center, transparent 0%, var(--bg-dark) 80%);
         }
 
-        .hero-title {
+        .hero h1 {
             font-size: 4rem;
-            font-weight: 800;
-            background: linear-gradient(to right, #60a5fa, #34d399);
+            margin-bottom: 1rem;
+            background: var(--gradient-title);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 20px;
-            animation: slideUp 1s ease-out;
+            font-weight: 800;
         }
 
-        .hero-subtitle {
+        .hero p {
             font-size: 1.5rem;
-            color: var(--text-sub);
+            color: var(--text-body);
             max-width: 800px;
-            margin-bottom: 40px;
-            line-height: 1.6;
         }
 
-        .btn-start {
-            padding: 15px 40px;
-            background: var(--primary);
-            color: white;
-            border: none;
+        /* --- 模式切换开关 --- */
+        .mode-switch-wrapper {
+            margin-top: 40px;
+            background: rgba(255,255,255,0.1);
+            padding: 5px;
             border-radius: 50px;
-            font-size: 1.2rem;
-            font-weight: bold;
+            display: inline-flex;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .mode-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-body);
+            padding: 12px 30px;
+            border-radius: 40px;
             cursor: pointer;
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .btn-start:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 30px rgba(59, 130, 246, 0.8);
+        .mode-btn.active {
+            background: var(--brand-blue);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4);
         }
 
-        /* --- 2. 交互式架构演示 (Grid 布局) --- */
+        /* --- 2. 内容区块 (图文混排) --- */
         .section {
-            padding: 80px 10%;
+            padding: 100px 10%;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
             min-height: 80vh;
-            border-bottom: 1px solid #334155;
-        }
-
-        .split-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 50px;
+            display: flex;
             align-items: center;
         }
 
-        .text-content h2 {
-            font-size: 2.5rem;
-            margin-bottom: 20px;
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr; /* 1:1 比例 */
+            gap: 60px;
+            width: 100%;
+            align-items: center;
         }
 
-        .text-content p {
-            font-size: 1.1rem;
-            color: var(--text-sub);
-            line-height: 1.8;
-            margin-bottom: 20px;
+        .text-col h2 { font-size: 2.5rem; margin-bottom: 1.5rem; }
+        .text-col p { font-size: 1.1rem; color: var(--text-body); margin-bottom: 1.5rem; text-align: justify; }
+        
+        /* 装饰性列表 */
+        .feature-list { list-style: none; padding: 0; }
+        .feature-list li {
+            margin-bottom: 15px;
+            padding-left: 30px;
+            position: relative;
+            color: #cbd5e1;
         }
+        .feature-list li::before {
+            content: '\f00c'; /* FontAwesome check */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            color: var(--brand-blue);
+        }
+        .feature-list.bad li::before { content: '\f00d'; color: var(--brand-red); } /* Cross icon */
 
+        /* 视觉演示盒子 */
         .visual-box {
             background: var(--bg-card);
-            border-radius: 20px;
-            height: 400px;
+            border-radius: 24px;
+            height: 450px;
             position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255,255,255,0.1);
             overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            border: 1px solid #334155;
         }
 
-        /* --- 架构模拟动画 --- */
-        .node {
+        /* 模拟元素样式 */
+        .sim-node {
             position: absolute;
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 0 15px currentColor;
+            display: flex; justify-content: center; align-items: center;
+            color: white; font-weight: bold; font-size: 0.9rem;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            transition: all 0.5s;
+        }
+        .sim-master { width: 90px; height: 90px; background: var(--brand-red); z-index: 10; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+        .sim-worker { width: 60px; height: 60px; background: var(--brand-green); }
+        .sim-dot { width: 8px; height: 8px; background: white; position: absolute; border-radius: 50%; pointer-events: none; }
+        
+        .stat-overlay {
+            position: absolute; bottom: 20px; left: 0; width: 100%;
+            text-align: center; font-family: monospace; font-size: 1.1rem;
         }
 
-        .master-node { width: 80px; height: 80px; background: var(--danger); top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 10; }
-        .worker-node { width: 50px; height: 50px; background: var(--accent); transition: all 1s; }
-        .client-dot {
-            width: 8px; height: 8px; background: white; position: absolute; border-radius: 50%; opacity: 0;
-        }
-
-        /* --- 3. 代码 IDE 仿真区 --- */
-        .ide-container {
-            background: var(--code-bg);
-            border-radius: 15px;
+        /* --- 3. 代码 IDE 区域 --- */
+        .ide-wrapper {
+            background: #0f111a;
+            border-radius: 16px;
+            border: 1px solid rgba(255,255,255,0.1);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid #334155;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
         }
-
         .ide-header {
-            background: #0f172a;
-            padding: 15px;
-            display: flex;
-            gap: 15px;
-            border-bottom: 1px solid #334155;
+            background: #1e293b; padding: 10px 20px;
+            display: flex; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);
         }
-
-        .tab {
-            padding: 8px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            color: var(--text-sub);
-            font-size: 0.9rem;
+        .ide-tab {
+            padding: 8px 16px; border-radius: 6px; font-size: 0.9rem; cursor: pointer; color: #64748b;
         }
-
-        .tab.active { background: #1e293b; color: white; border-left: 3px solid var(--primary); }
-
-        .ide-body {
-            display: flex;
-            height: 400px;
+        .ide-tab.active { background: var(--brand-blue); color: white; }
+        
+        .ide-content { display: grid; grid-template-columns: 1.5fr 1fr; height: 400px; }
+        .code-area { padding: 20px; font-family: 'Consolas', monospace; color: #e2e8f0; font-size: 14px; border-right: 1px solid rgba(255,255,255,0.05); }
+        .monitor-area { padding: 20px; background: #131720; display: flex; flex-direction: column; }
+        
+        .progress-bar { height: 8px; background: #334155; border-radius: 4px; margin: 10px 0 20px; overflow: hidden; }
+        .progress-fill { height: 100%; width: 0%; transition: width 0.2s; }
+        
+        .run-btn {
+            margin-top: auto; padding: 12px; background: var(--brand-green); color: white;
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
         }
+        .run-btn:hover { background: #059669; }
 
-        .editor {
-            flex: 1;
-            padding: 20px;
-            font-family: 'Consolas', monospace;
-            color: #d4d4d4;
-            font-size: 14px;
-            line-height: 1.6;
-            border-right: 1px solid #334155;
-            position: relative;
-        }
+        /* 代码高亮色 */
+        .c-kw { color: #c678dd; } .c-str { color: #98c379; } .c-com { color: #5c6370; font-style: italic; }
 
-        .monitor {
-            flex: 1;
-            padding: 20px;
-            background: #1e293b;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .latency-bar-container {
-            margin-top: 20px;
-        }
-
-        .latency-bar {
-            height: 20px;
-            background: #334155;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 5px;
-            position: relative;
-        }
-
-        .latency-fill {
-            height: 100%;
-            width: 0%;
-            transition: width 0.1s linear;
-        }
-
-        .btn-run {
-            margin-top: auto;
-            padding: 10px;
-            background: var(--accent);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .btn-run:disabled { background: #64748b; cursor: not-allowed; }
-
-        /* 语法高亮 */
-        .kwd { color: #569cd6; } /* keyword */
-        .str { color: #ce9178; } /* string */
-        .fn { color: #dcdcaa; } /* function */
-        .com { color: #6a9955; } /* comment */
-
-        /* 动画 */
-        @keyframes pulse { 0% { opacity: 0.5; } 50% { opacity: 1; } 100% { opacity: 0.5; } }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
-
+        /* --- 4. 表格区域 --- */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: var(--bg-card); border-radius: 12px; overflow: hidden; }
+        th, td { padding: 15px 20px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        th { background: rgba(255,255,255,0.05); color: var(--brand-blue); }
+        
         /* 响应式 */
-        @media (max-width: 768px) {
-            .split-layout { grid-template-columns: 1fr; }
-            .hero-title { font-size: 2.5rem; }
+        @media (max-width: 900px) {
+            .hero h1 { font-size: 2.5rem; }
+            .grid-layout { grid-template-columns: 1fr; gap: 40px; }
+            .visual-box { height: 350px; }
+            .ide-content { grid-template-columns: 1fr; height: auto; }
+            .code-area { height: 300px; }
         }
     </style>
 </head>
 <body>
 
-    <canvas id="hero-canvas"></canvas>
+    <canvas id="canvas-bg"></canvas>
 
-    <div class="hero-section">
-        <h1 class="hero-title">300PB 数据的极限挑战</h1>
-        <p class="hero-subtitle">
-            从 <strong>拥堵的 JFS 集中式架构</strong> 到 <strong>Alluxio DORA 去中心化架构</strong>。<br>
-            专为自动驾驶 MCAP 高并发挖掘场景设计。
-        </p>
-        <button class="btn-start" onclick="document.getElementById('demo-part-1').scrollIntoView({behavior: 'smooth'})">
-            <i class="fas fa-play-circle"></i> 开始交互体验
-        </button>
+    <div class="hero">
+        <div style="margin-bottom: 20px; color: var(--brand-blue); letter-spacing: 2px; font-weight: bold;">ALLUXIO 解决方案演示</div>
+        <h1>300PB 数据挖掘架构演进</h1>
+        <p>应对 10 万并发挑战：从 JFS 集中式瓶颈到 DORA 去中心化架构</p>
+        
+        <div class="mode-switch-wrapper">
+            <button class="mode-btn active" onclick="switchMode('story')" id="btn-story">
+                <i class="fas fa-book-open"></i> 通俗类比模式 (Story)
+            </button>
+            <button class="mode-btn" onclick="switchMode('tech')" id="btn-tech">
+                <i class="fas fa-microchip"></i> 技术专家模式 (Tech)
+            </button>
+        </div>
+        
+        <div style="margin-top: 50px; animation: bounce 2s infinite;">
+            <i class="fas fa-chevron-down" style="color: var(--text-body); font-size: 1.5rem;"></i>
+        </div>
     </div>
 
-    <div id="demo-part-1" class="section">
-        <div class="split-layout">
-            <div class="text-content">
-                <h2 style="color: var(--danger)"><i class="fas fa-exclamation-triangle"></i> 瓶颈现状：JFS 集中式架构</h2>
-                <p>
-                    <strong>场景：</strong> 10 万个并发任务同时向“元数据 Master”发起请求。<br>
-                    <strong>结果：</strong> <span style="color:var(--danger)">系统雪崩。</span>
-                </p>
-                <p>
-                    这就像 10 万个人同时挤进一个超市的单一收银台。Master 节点成为绝对瓶颈，CPU 负载 100%，请求排队超时。
-                </p>
-                <div style="background: rgba(239, 68, 68, 0.1); padding: 15px; border-left: 4px solid var(--danger); border-radius: 4px;">
-                    <i class="fas fa-bug"></i> <strong>演示说明：</strong> 右侧模拟了 500 个请求同时攻击单一 Master 节点的场景。红色代表阻塞。
+    <div class="section">
+        <div class="grid-layout">
+            <div class="text-col">
+                <h2 id="title-pain" class="danger"><i class="fas fa-exclamation-triangle"></i> 故事背景：拥堵的图书馆</h2>
+                
+                <div id="text-pain-story" class="fade-in">
+                    <p>想象我们经营着一家<strong>“巨型机器人图书馆”</strong>（数据中心），藏着 300亿本 机器人写的日记（MCAP文件）。</p>
+                    <p><strong>现在的困境：</strong> 图书馆只有一个“总管”（JFS Master）。</p>
+                    <ul class="feature-list bad">
+                        <li><strong>门口堵死：</strong> 当 10 万个学生（并发任务）同时来问“《日记A》在哪”时，总管嗓子喊哑了也处理不过来，大厅挤得水泄不通。</li>
+                        <li><strong>被迫分店：</strong> 为了分流，我们被迫在旁边开了好几个分馆（拆分集群），结果书放得乱七八糟，管理极其困难。</li>
+                        <li><strong>手续繁琐：</strong> 借书必须办实体卡（FUSE挂载），又重又慢。</li>
+                    </ul>
+                </div>
+
+                <div id="text-pain-tech" class="hidden fade-in">
+                    <p><strong>现状架构 (AS-IS)：</strong> 业务采用 BOS + JFS 方案，计算侧使用 JFS Localcache。</p>
+                    <p><strong>核心瓶颈：</strong> 集中式元数据管理 (Centralized Metadata)。</p>
+                    <ul class="feature-list bad">
+                        <li><strong>Master 单点瓶颈：</strong> 在 10 万+ 并发连接下，单一 Master 节点的 QPS 达到极限，导致 Open/Lookup 请求超时。</li>
+                        <li><strong>多集群运维地狱：</strong> 为规避单点，被迫物理拆分多个 JFS 集群，造成数据孤岛，容量规划失效。</li>
+                        <li><strong>FUSE 开销：</strong> 强依赖 Fuse 挂载，上下文切换（Context Switch）消耗大量 CPU，且 Pod 启动慢。</li>
+                    </ul>
                 </div>
             </div>
-            <div class="visual-box" id="visual-jfs">
-                <div class="master-node">Master</div>
-                <div style="position: absolute; bottom: 10px; width: 100%; text-align: center; color: var(--danger); font-weight: bold;">
-                    阻塞率: <span id="block-rate">0%</span> (模拟中...)
+
+            <div class="visual-box" id="viz-jfs">
+                <div class="sim-node sim-master" id="label-master">总管</div>
+                <div class="stat-overlay danger">
+                    <i class="fas fa-spinner fa-spin"></i> 阻塞率: <span id="val-block">0%</span>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="section">
-        <div class="split-layout">
-            <div class="visual-box" id="visual-alluxio">
-                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 200px; height: 200px; border: 2px dashed #334155; border-radius: 50%;"></div>
-                <div style="position: absolute; bottom: 10px; width: 100%; text-align: center; color: var(--accent); font-weight: bold;">
-                    吞吐量: <span id="tps-rate">0</span> MB/s (线性增长)
+        <div class="grid-layout">
+            <div class="visual-box" id="viz-alluxio">
+                <div class="stat-overlay success">
+                    <i class="fas fa-bolt"></i> 吞吐量: <span id="val-tps">0</span> MB/s
                 </div>
             </div>
-            <div class="text-content">
-                <h2 style="color: var(--accent)"><i class="fas fa-project-diagram"></i> 架构升级：Alluxio DORA</h2>
-                <p>
-                    <strong>核心原理：</strong> 一致性哈希 (Consistent Hashing)。<br>
-                    <strong>效果：</strong> <span style="color:var(--accent)">线性扩展，永不拥堵。</span>
-                </p>
-                <p>
-                    不再有“总管”。文件元数据被均匀打散到所有 Worker 节点。客户端通过计算 Hash 值，直接找到对应的 Worker。
-                </p>
-                <div style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-left: 4px solid var(--accent); border-radius: 4px;">
-                    <i class="fas fa-check-circle"></i> <strong>演示说明：</strong> 左侧展示了 DORA 架构。请求被均匀分发到环上的 6 个 Worker 节点，毫无阻塞。
+
+            <div class="text-col">
+                <h2 id="title-sol" class="success"><i class="fas fa-rocket"></i> 解决方案：智能物流系统</h2>
+                
+                <div id="text-sol-story" class="fade-in">
+                    <p>Alluxio 引入了一套全新的<strong>“全员经理制”</strong>管理系统。</p>
+                    <ul class="feature-list">
+                        <li><strong>不再依赖总管：</strong> 系统通过魔法（算法）把目录平均分给所有窗口的工作人员。10 万人来借书，会被自动分流到 100 个不同的窗口，<strong>永远不排队</strong>。</li>
+                        <li><strong>送书上门（无卡化）：</strong> 学生不用办实体卡（FUSE）了。每人发一个智能平板（SDK），点一下，内容直接传输到眼前。</li>
+                        <li><strong>想扩就扩：</strong> 人太多？随时加几个集装箱窗口（Worker），处理能力无限提升。</li>
+                    </ul>
+                </div>
+
+                <div id="text-sol-tech" class="hidden fade-in">
+                    <p><strong>目标架构 (TO-BE)：</strong> Alluxio Enterprise AI (DORA 架构)。</p>
+                    <ul class="feature-list">
+                        <li><strong>DORA 去中心化架构：</strong> 采用一致性哈希 (Consistent Hashing)，将元数据分散到所有 Worker 节点。并发能力随节点数<strong>线性扩展</strong>，彻底消除 Master 瓶颈。</li>
+                        <li><strong>SDK 直连 (No FUSE)：</strong> 客户端嵌入 Alluxio Python SDK，移除 FUSE 内核态切换开销。支持 MCAP 的 Range Read/Seek 操作。</li>
+                        <li><strong>Cluster Cache：</strong> 替代 Localcache，提供分布式共享缓存，显著降低 BOS 带宽压力。</li>
+                    </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="section" style="background: #111827;">
-        <div style="text-align: center; margin-bottom: 40px;">
-            <h2><i class="fas fa-code"></i> 开发者体验对比实验室</h2>
-            <p style="color: var(--text-sub)">点击运行，亲身体验 FUSE 挂载模式与 SDK 直连模式的性能差异</p>
+    <div class="section" style="display: block;">
+        <div style="text-align: center; margin-bottom: 50px;">
+            <h2><i class="fas fa-code"></i> 开发体验对比 (Developer Experience)</h2>
+            <p style="color: var(--text-body)">点击“运行”按钮，直观感受 FUSE 挂载与 SDK 直连在性能与代码上的差异。</p>
         </div>
 
-        <div class="ide-container">
+        <div class="ide-wrapper">
             <div class="ide-header">
-                <div class="tab active" onclick="switchTab('jfs')" id="tab-jfs">Legacy: JFS (FUSE)</div>
-                <div class="tab" onclick="switchTab('alluxio')" id="tab-alluxio">Next-Gen: Alluxio SDK</div>
+                <div class="ide-tab active" onclick="setIde('jfs')" id="tab-jfs">JFS (FUSE Mode)</div>
+                <div class="ide-tab" onclick="setIde('alluxio')" id="tab-alluxio">Alluxio (SDK Mode)</div>
             </div>
-            
-            <div class="ide-body">
-                <div class="editor" id="code-content">
+            <div class="ide-content">
+                <div class="code-area" id="code-display">
                     </div>
-
-                <div class="monitor">
-                    <h3 style="margin-top: 0; color: white;">性能监控面板</h3>
+                <div class="monitor-area">
+                    <div style="margin-bottom: 20px;">
+                        <span style="color: #94a3b8; font-size: 0.8rem;">I/O LATENCY (延时)</span>
+                        <div class="progress-bar"><div class="progress-fill" id="bar-latency" style="background: var(--brand-red);"></div></div>
+                        <span id="val-latency" style="color: white; font-weight: bold; float: right;">0ms</span>
+                    </div>
                     
-                    <div class="latency-bar-container">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-sub);">
-                            <span>IO Latency (延时)</span>
-                            <span id="latency-val">0ms</span>
-                        </div>
-                        <div class="latency-bar">
-                            <div class="latency-fill" id="bar-latency"></div>
-                        </div>
+                    <div>
+                        <span style="color: #94a3b8; font-size: 0.8rem;">CPU OVERHEAD (消耗)</span>
+                        <div class="progress-bar"><div class="progress-fill" id="bar-cpu" style="background: var(--brand-red);"></div></div>
+                        <span id="val-cpu" style="color: white; font-weight: bold; float: right;">0%</span>
                     </div>
 
-                    <div class="latency-bar-container">
-                        <div style="display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-sub);">
-                            <span>CPU Context Switch (消耗)</span>
-                            <span id="cpu-val">0%</span>
-                        </div>
-                        <div class="latency-bar">
-                            <div class="latency-fill" id="bar-cpu"></div>
-                        </div>
+                    <div id="console-output" style="margin-top: 20px; color: #64748b; font-size: 0.8rem; height: 100px; overflow-y: auto; border-top: 1px solid #334155; padding-top: 10px;">
+                        > 等待运行...
                     </div>
 
-                    <div style="margin-top: 20px; font-family: monospace; font-size: 0.8rem; height: 100px; overflow-y: auto; color: #64748b;" id="console-log">
-                        > Ready to run...
-                    </div>
-
-                    <button class="btn-run" onclick="runCode()" id="btn-run-code">
-                        <i class="fas fa-play"></i> 运行代码仿真
+                    <button class="run-btn" onclick="runSimulation()">
+                        <i class="fas fa-play"></i> 运行模拟 (Run)
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="section" style="display: block; padding-top: 0;">
+        <h2 style="text-align: center; margin-bottom: 30px;">核心价值总结</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>核心维度</th>
+                    <th>JFS 方案 (现状)</th>
+                    <th>Alluxio DORA (新方案)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>并发能力</strong></td>
+                    <td style="color: var(--brand-red)">万级瓶颈，需物理拆分集群</td>
+                    <td style="color: var(--brand-green)">10万+ 线性扩展，单一大集群</td>
+                </tr>
+                <tr>
+                    <td><strong>接入方式</strong></td>
+                    <td>FUSE 挂载 (重型，依赖内核)</td>
+                    <td style="color: var(--brand-green)">SDK 集成 (轻量，纯用户态)</td>
+                </tr>
+                <tr>
+                    <td><strong>运维成本</strong></td>
+                    <td>高 (维护多个孤岛集群)</td>
+                    <td style="color: var(--brand-green)">低 (K8S 弹性伸缩，自动化)</td>
+                </tr>
+                <tr>
+                    <td><strong>MCAP适配</strong></td>
+                    <td>Localcache 命中率低</td>
+                    <td style="color: var(--brand-green)">Cluster Cache 共享，Range Read 优化</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
     <script>
-        /* ================== 1. Hero Canvas 粒子背景 (模拟数据流视频) ================== */
-        const canvas = document.getElementById('hero-canvas');
-        const ctx = canvas.getContext('2d');
-        let particles = [];
+        /* --- 1. 背景动画 --- */
+        const cvs = document.getElementById('canvas-bg');
+        const ctx = cvs.getContext('2d');
+        let w, h;
+        const particles = [];
 
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        class Particle {
-            constructor() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 2 + 1;
-                this.speedX = Math.random() * 3 + 1; // 向右流动
-                this.speedY = (Math.random() - 0.5) * 0.5;
-                this.color = `rgba(59, 130, 246, ${Math.random() * 0.5})`; // 蓝色基调
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x > canvas.width) this.x = 0;
-                if (this.y > canvas.height || this.y < 0) this.y = Math.random() * canvas.height;
-            }
-            draw() {
-                ctx.fillStyle = this.color;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fill();
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            for (let i = 0; i < 150; i++) {
-                particles.push(new Particle());
-            }
-        }
-
-        function animateParticles() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            // 绘制网格线增强科技感
-            ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-            ctx.beginPath();
-            for(let i=0; i<canvas.width; i+=50) { ctx.moveTo(i,0); ctx.lineTo(i, canvas.height); }
-            for(let i=0; i<canvas.height; i+=50) { ctx.moveTo(0,i); ctx.lineTo(canvas.width, i); }
-            ctx.stroke();
-
-            particles.forEach(p => {
-                p.update();
-                p.draw();
+        function init() {
+            w = window.innerWidth; h = window.innerHeight;
+            cvs.width = w; cvs.height = h;
+            particles.length = 0;
+            for(let i=0; i<100; i++) particles.push({
+                x: Math.random()*w, y: Math.random()*h,
+                vx: Math.random()*0.5, vy: Math.random()*0.5,
+                size: Math.random()*2
             });
-            requestAnimationFrame(animateParticles);
         }
-        initParticles();
-        animateParticles();
+        window.onresize = init;
+        init();
 
+        function anim() {
+            ctx.clearRect(0,0,w,h);
+            ctx.fillStyle = 'rgba(59, 130, 246, 0.3)';
+            particles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if(p.x > w) p.x = 0; if(p.y > h) p.y = 0;
+                ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI*2); ctx.fill();
+            });
+            requestAnimationFrame(anim);
+        }
+        anim();
 
-        /* ================== 2. 架构模拟动画 (Architecture Simulator) ================== */
-        // JFS 模拟: 所有点汇聚到中心
-        function startJFSSimulation() {
-            const container = document.getElementById('visual-jfs');
-            const master = container.querySelector('.master-node');
-            const rateSpan = document.getElementById('block-rate');
+        /* --- 2. 模式切换 --- */
+        let currentMode = 'story';
+        
+        function switchMode(mode) {
+            currentMode = mode;
+            const btnStory = document.getElementById('btn-story');
+            const btnTech = document.getElementById('btn-tech');
+            
+            // 按钮状态
+            if(mode === 'story') {
+                btnStory.classList.add('active'); btnTech.classList.remove('active');
+            } else {
+                btnTech.classList.add('active'); btnStory.classList.remove('active');
+            }
+
+            // 内容切换
+            toggleVisibility('text-pain-story', mode === 'story');
+            toggleVisibility('text-pain-tech', mode === 'tech');
+            toggleVisibility('text-sol-story', mode === 'story');
+            toggleVisibility('text-sol-tech', mode === 'tech');
+
+            // 标题切换
+            document.getElementById('title-pain').innerHTML = mode === 'story' ? 
+                '<i class="fas fa-exclamation-triangle"></i> 故事背景：拥堵的图书馆' : 
+                '<i class="fas fa-server"></i> 现状架构瓶颈分析';
+            
+            document.getElementById('title-sol').innerHTML = mode === 'story' ? 
+                '<i class="fas fa-rocket"></i> 解决方案：智能物流系统' : 
+                '<i class="fas fa-project-diagram"></i> 目标架构：Alluxio DORA';
+
+            // 动画标签切换
+            document.getElementById('label-master').innerText = mode === 'story' ? "总管" : "Master";
+            const workers = document.querySelectorAll('.sim-worker');
+            workers.forEach((w, i) => w.innerText = mode === 'story' ? "窗口" : "Worker");
+        }
+
+        function toggleVisibility(id, show) {
+            const el = document.getElementById(id);
+            if(show) { el.classList.remove('hidden'); el.classList.add('fade-in'); }
+            else { el.classList.add('hidden'); }
+        }
+
+        /* --- 3. 视觉模拟动画 --- */
+        // JFS 拥堵模拟
+        function simJFS() {
+            const box = document.getElementById('viz-jfs');
+            const master = document.getElementById('label-master');
+            const rate = document.getElementById('val-block');
             
             setInterval(() => {
+                if(document.hidden) return;
                 const dot = document.createElement('div');
-                dot.className = 'client-dot';
-                // 随机从四周生成
-                const side = Math.floor(Math.random() * 4);
-                if (side===0) { dot.style.top = '0px'; dot.style.left = Math.random()*100 + '%'; }
-                if (side===1) { dot.style.bottom = '0px'; dot.style.left = Math.random()*100 + '%'; }
-                if (side===2) { dot.style.left = '0px'; dot.style.top = Math.random()*100 + '%'; }
-                if (side===3) { dot.style.right = '0px'; dot.style.top = Math.random()*100 + '%'; }
-                
-                container.appendChild(dot);
+                dot.className = 'sim-dot';
+                dot.style.left = Math.random()*100 + '%';
+                dot.style.top = Math.random() > 0.5 ? '0%' : '100%';
+                box.appendChild(dot);
 
-                // 动画: 移动到中心
-                const centerX = container.offsetWidth / 2;
-                const centerY = container.offsetHeight / 2;
-                
-                // 使用 Web Animation API
                 const anim = dot.animate([
-                    { opacity: 1 },
-                    { transform: `translate(${centerX - dot.offsetLeft}px, ${centerY - dot.offsetTop}px)` }
-                ], {
-                    duration: 1500,
-                    easing: 'ease-in'
-                });
+                    { transform: 'translate(0,0)' },
+                    { transform: `translate(${box.offsetWidth/2 - dot.offsetLeft}px, ${box.offsetHeight/2 - dot.offsetTop}px)` }
+                ], { duration: 2000, easing: 'ease-in' });
 
                 anim.onfinish = () => {
                     dot.remove();
-                    // 模拟阻塞率跳动
-                    let rate = parseInt(rateSpan.innerText);
-                    if(Math.random() > 0.3) rate += 5; 
-                    if(rate > 99) rate = 80;
-                    rateSpan.innerText = rate + '%';
-                    rateSpan.style.color = rate > 80 ? '#ef4444' : '#f59e0b';
-                    
-                    // Master 震动效果
-                    master.style.transform = `translate(-50%, -50%) scale(${1 + Math.random()*0.2})`;
+                    master.style.transform = `translate(-50%, -50%) scale(${1 + Math.random()*0.3})`; // 震动
+                    let r = parseInt(rate.innerText) || 0;
+                    if(r < 95) rate.innerText = (r + 5) + '%';
                 };
-            }, 100); // 频率
+            }, 200);
         }
+        simJFS();
 
-        // Alluxio 模拟: 点分散到圆环
-        function startAlluxioSimulation() {
-            const container = document.getElementById('visual-alluxio');
-            const tpsSpan = document.getElementById('tps-rate');
-            const centerX = container.offsetWidth / 2;
-            const centerY = container.offsetHeight / 2;
-            const radius = 100;
+        // Alluxio 分布式模拟
+        function simAlluxio() {
+            const box = document.getElementById('viz-alluxio');
+            const tps = document.getElementById('val-tps');
+            const cx = box.offsetWidth / 2;
+            const cy = box.offsetHeight / 2;
+            const r = 120;
 
-            // 创建 Worker 节点环
+            // 创建 Worker 环
             for(let i=0; i<6; i++) {
-                const angle = (i / 6) * Math.PI * 2;
-                const wx = centerX + Math.cos(angle) * radius - 25;
-                const wy = centerY + Math.sin(angle) * radius - 25;
-                
-                const worker = document.createElement('div');
-                worker.className = 'node worker-node';
-                worker.innerText = "W"+(i+1);
-                worker.style.left = wx + 'px';
-                worker.style.top = wy + 'px';
-                container.appendChild(worker);
+                const ang = (i/6) * Math.PI*2;
+                const w = document.createElement('div');
+                w.className = 'sim-node sim-worker';
+                w.innerText = currentMode === 'story' ? "窗口" : "Worker";
+                w.style.left = (cx + Math.cos(ang)*r - 30) + 'px';
+                w.style.top = (cy + Math.sin(ang)*r - 30) + 'px';
+                w.id = `worker-${i}`;
+                box.appendChild(w);
             }
 
-            let tps = 0;
+            let val = 0;
             setInterval(() => {
+                if(document.hidden) return;
                 const dot = document.createElement('div');
-                dot.className = 'client-dot';
-                dot.style.top = '50%';
-                dot.style.left = '50%';
-                dot.style.background = '#10b981';
-                container.appendChild(dot);
+                dot.className = 'sim-dot';
+                dot.style.left = '50%'; dot.style.top = '50%';
+                dot.style.background = '#34d399';
+                box.appendChild(dot);
 
-                // 随机去往某个 Worker
-                const targetIdx = Math.floor(Math.random() * 6);
-                const angle = (targetIdx / 6) * Math.PI * 2;
-                const tx = Math.cos(angle) * radius;
-                const ty = Math.sin(angle) * radius;
+                const targetIdx = Math.floor(Math.random()*6);
+                const target = document.getElementById(`worker-${targetIdx}`);
+                const tx = target.offsetLeft + 30;
+                const ty = target.offsetTop + 30;
 
                 const anim = dot.animate([
-                    { opacity: 1, transform: 'translate(0, 0)' },
-                    { transform: `translate(${tx}px, ${ty}px)`, opacity: 0 }
-                ], {
-                    duration: 800,
-                    easing: 'linear'
-                });
+                    { transform: 'translate(0,0)', opacity: 1 },
+                    { transform: `translate(${tx - cx}px, ${ty - cy}px)`, opacity: 0 }
+                ], { duration: 800 });
 
                 anim.onfinish = () => {
                     dot.remove();
-                    tps += 50;
-                    tpsSpan.innerText = tps.toLocaleString();
-                    
-                    // Worker 闪烁
-                    const workers = container.querySelectorAll('.worker-node');
-                    workers[targetIdx].style.boxShadow = '0 0 20px #10b981';
-                    setTimeout(() => workers[targetIdx].style.boxShadow = '0 0 15px currentColor', 200);
+                    val += 50;
+                    tps.innerText = val.toLocaleString();
+                    target.style.boxShadow = '0 0 30px #10b981';
+                    setTimeout(() => target.style.boxShadow = 'none', 200);
                 };
-            }, 50); // 更快
+            }, 100);
         }
+        setTimeout(simAlluxio, 500); // 延时等待布局完成
 
-        // 启动模拟
-        setTimeout(startJFSSimulation, 1000);
-        setTimeout(startAlluxioSimulation, 1000);
+        /* --- 4. 代码 IDE --- */
+        let ideMode = 'jfs';
+        const codeJFS = `<span class="c-com"># --- 传统方式: JFS FUSE ---</span>
+<span class="c-kw">import</span> os
 
+<span class="c-com"># 1. 必须挂载 (阻塞, 需Root权限)</span>
+os.system(<span class="c-str">"mount -t juicefs /dev/disk /mnt/data"</span>)
 
-        /* ================== 3. 代码实验室逻辑 (Code Lab) ================== */
-        const codeJFS = `
-<span class="com"># --- JFS (Old Way) ---</span>
-<span class="com"># 痛点: 需 root 权限, 内核态切换开销大</span>
-<span class="kwd">import</span> os
-
-<span class="com"># 1. 挂载 (阻塞操作)</span>
-os.system(<span class="str">"mount -t juicefs /dev/vdb /mnt/jfs"</span>)
-
-<span class="com"># 2. 读取文件 (经过 FUSE)</span>
-<span class="kwd">with</span> open(<span class="str">"/mnt/jfs/data.mcap"</span>, <span class="str">"rb"</span>) <span class="kwd">as</span> f:
+<span class="c-com"># 2. 读取文件 (内核态 FUSE 开销大)</span>
+<span class="c-kw">with</span> open(<span class="c-str">"/mnt/data/log.mcap"</span>, <span class="c-str">"rb"</span>) <span class="c-kw">as</span> f:
     f.seek(offset)
-    data = f.read(1024)
-`;
+    data = f.read(1024)`;
 
-        const codeAlluxio = `
-<span class="com"># --- Alluxio SDK (New Way) ---</span>
-<span class="com"># 优势: 纯用户态, 零拷贝, 哈希直连</span>
-<span class="kwd">from</span> alluxio <span class="kwd">import</span> Client
+        const codeAlluxio = `<span class="c-com"># --- 新一代: Alluxio SDK ---</span>
+<span class="c-kw">from</span> alluxio <span class="c-kw">import</span> Client
 
-<span class="com"># 1. 初始化客户端 (轻量级)</span>
-client = Client(<span class="str">"alluxio-cluster"</span>)
+<span class="c-com"># 1. 轻量级客户端 (无挂载, 纯用户态)</span>
+client = Client(<span class="c-str">"alluxio-cluster"</span>)
 
-<span class="com"># 2. 直连 Worker 读取 (Hit Cluster Cache)</span>
-<span class="kwd">with</span> client.open(<span class="str">"s3://data.mcap"</span>) <span class="kwd">as</span> f:
-    data = f.read_range(offset, 1024)
-`;
+<span class="c-com"># 2. 直连读取 (哈希定位 + 零拷贝)</span>
+<span class="c-kw">with</span> client.open(<span class="c-str">"s3://log.mcap"</span>) <span class="c-kw">as</span> f:
+    <span class="c-com"># 智能缓存命中</span>
+    data = f.read_range(offset, 1024)`;
 
-        let currentMode = 'jfs';
-        const editor = document.getElementById('code-content');
-        
-        function switchTab(mode) {
-            currentMode = mode;
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.getElementById('tab-' + mode).classList.add('active');
-            editor.innerHTML = mode === 'jfs' ? codeJFS : codeAlluxio;
-            // 重置监控
-            resetMonitor();
-        }
-
-        function resetMonitor() {
+        function setIde(mode) {
+            ideMode = mode;
+            document.querySelectorAll('.ide-tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(`tab-${mode}`).classList.add('active');
+            document.getElementById('code-display').innerHTML = mode === 'jfs' ? codeJFS : codeAlluxio;
+            // 重置 Monitor
             document.getElementById('bar-latency').style.width = '0%';
             document.getElementById('bar-cpu').style.width = '0%';
-            document.getElementById('latency-val').innerText = '0ms';
-            document.getElementById('cpu-val').innerText = '0%';
-            document.getElementById('console-log').innerHTML = '> Ready...';
+            document.getElementById('val-latency').innerText = '0ms';
+            document.getElementById('val-cpu').innerText = '0%';
+            document.getElementById('console-output').innerHTML = '> 等待运行...';
         }
+        setIde('jfs'); // init
 
-        function runCode() {
-            const btn = document.getElementById('btn-run-code');
-            const consoleLog = document.getElementById('console-log');
-            btn.disabled = true;
-            consoleLog.innerHTML = '> Compiling & Running...<br>';
-
-            const isJFS = currentMode === 'jfs';
+        function runSimulation() {
+            const log = document.getElementById('console-output');
+            const isJFS = ideMode === 'jfs';
             
-            // 模拟进度条动画
+            log.innerHTML = '> 正在编译并运行...<br>';
+            
             setTimeout(() => {
-                if (isJFS) {
-                    // JFS 慢速
-                    document.getElementById('bar-latency').style.width = '90%';
-                    document.getElementById('bar-latency').style.background = '#ef4444'; // Red
-                    document.getElementById('latency-val').innerText = '1500ms (High)';
-                    
-                    document.getElementById('bar-cpu').style.width = '80%';
+                if(isJFS) {
+                    document.getElementById('bar-latency').style.width = '85%';
+                    document.getElementById('bar-latency').style.background = '#ef4444';
+                    document.getElementById('val-latency').innerText = '1200ms';
+
+                    document.getElementById('bar-cpu').style.width = '70%';
                     document.getElementById('bar-cpu').style.background = '#ef4444';
-                    document.getElementById('cpu-val').innerText = '80% (Context Switch)';
-                    
-                    consoleLog.innerHTML += '<span style="color:#ef4444">[WARN] FUSE bottleneck detected.</span><br>';
-                    consoleLog.innerHTML += '> Execution Time: 2.4s';
+                    document.getElementById('val-cpu').innerText = '70%';
+
+                    log.innerHTML += '<span style="color:#ef4444">[WARN] FUSE Context Switch High!</span><br>';
+                    log.innerHTML += '> Read 1024 bytes in 1.2s';
                 } else {
-                    // Alluxio 极速
                     document.getElementById('bar-latency').style.width = '10%';
-                    document.getElementById('bar-latency').style.background = '#10b981'; // Green
-                    document.getElementById('latency-val').innerText = '20ms (Low)';
-                    
+                    document.getElementById('bar-latency').style.background = '#10b981';
+                    document.getElementById('val-latency').innerText = '20ms';
+
                     document.getElementById('bar-cpu').style.width = '5%';
                     document.getElementById('bar-cpu').style.background = '#10b981';
-                    document.getElementById('cpu-val').innerText = '5% (User Mode)';
-                    
-                    consoleLog.innerHTML += '<span style="color:#10b981">[INFO] Cache HIT on Worker-04.</span><br>';
-                    consoleLog.innerHTML += '> Execution Time: 0.1s';
-                }
-                btn.disabled = false;
-            }, isJFS ? 2000 : 500); // JFS 模拟慢，Alluxio 模拟快
-        }
+                    document.getElementById('val-cpu').innerText = '5%';
 
-        // 初始化
-        switchTab('jfs');
+                    log.innerHTML += '<span style="color:#10b981">[INFO] Direct Read from Worker. Cache HIT.</span><br>';
+                    log.innerHTML += '> Read 1024 bytes in 0.02s';
+                }
+            }, isJFS ? 1500 : 500);
+        }
 
     </script>
 </body>
