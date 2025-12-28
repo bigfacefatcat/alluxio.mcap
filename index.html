@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>300PB 数据挖掘：下一代架构演示 (Comic Edition)</title>
+    <title>300PB 自动驾驶挖掘：巨人图书馆的进化史</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-dark: #1a1a1a;
-            --bg-comic: #ffffff;
-            --primary: #3b82f6;
-            --accent: #f59e0b; /* 漫画黄 */
-            --danger: #ef4444;
-            --success: #10b981;
-            --comic-border: 3px solid #000;
-            --shadow-hard: 5px 5px 0px #000;
+            --bg-dark: #121212;
+            --comic-white: #ffffff;
+            --primary: #3b82f6; /* 科技蓝 */
+            --accent: #f59e0b;  /* 漫画黄 */
+            --danger: #ef4444;  /* 警告红 */
+            --success: #10b981; /* 成功绿 */
+            --border: 3px solid #000;
+            --shadow: 6px 6px 0px rgba(0,0,0,0.8);
         }
 
         body {
@@ -27,169 +27,106 @@
             overflow-x: hidden;
         }
 
-        /* --- 动态背景 Canvas --- */
+        /* --- 动态背景 --- */
         #canvas-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
-            opacity: 0.2;
-            pointer-events: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; opacity: 0.15; pointer-events: none;
         }
 
-        /* --- 通用组件 --- */
+        /* --- UI 组件 --- */
         .hidden { display: none !important; }
         .fade-in { animation: fadeIn 0.5s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .btn {
-            border: var(--comic-border);
-            background: var(--accent);
-            color: black;
-            padding: 10px 25px;
-            font-family: 'Bangers', cursive;
-            font-size: 1.2rem;
-            cursor: pointer;
-            box-shadow: var(--shadow-hard);
-            transition: transform 0.1s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            border: var(--border); background: var(--accent); color: #000;
+            padding: 10px 20px; font-family: 'Bangers'; font-size: 1.2rem; cursor: pointer;
+            box-shadow: var(--shadow); transition: transform 0.1s; text-transform: uppercase;
         }
-        .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0px #000; }
-        .btn.active { background: var(--primary); color: white; }
+        .btn:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #000; }
+        .btn.active { background: var(--primary); color: #fff; }
 
-        /* --- Hero Section --- */
-        .hero {
-            height: 90vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            color: white;
-            background: radial-gradient(circle, transparent 0%, #000 90%);
-        }
-        .hero h1 {
-            font-family: 'Bangers', cursive;
-            font-size: 5rem;
-            letter-spacing: 2px;
-            text-shadow: 4px 4px 0 #3b82f6;
-            margin: 0;
-            line-height: 1.1;
-        }
-        .hero p { font-size: 1.5rem; color: #cbd5e1; max-width: 800px; margin-top: 20px; }
-
-        /* --- 漫画分镜风格容器 (Comic Panel) --- */
-        .section {
-            padding: 80px 20px;
-            display: flex;
-            justify-content: center;
-        }
-
+        /* --- 漫画分镜容器 --- */
+        .section { padding: 60px 20px; display: flex; justify-content: center; }
+        
         .comic-panel {
-            background: var(--bg-comic);
-            border: var(--comic-border);
+            background: var(--comic-white);
+            border: var(--border);
             box-shadow: 10px 10px 0px rgba(255,255,255,0.1);
-            max-width: 1200px;
-            width: 100%;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            overflow: hidden;
-            position: relative;
+            max-width: 1100px; width: 100%;
+            display: grid; grid-template-columns: 1fr 1fr;
+            position: relative; overflow: hidden;
         }
 
-        /* 漫画速度线背景 */
         .speed-lines {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: repeating-linear-gradient(90deg, transparent, transparent 10px, rgba(0,0,0,0.03) 10px, rgba(0,0,0,0.03) 20px);
-            z-index: 0;
-            pointer-events: none;
+            background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0,0,0,0.02) 10px, rgba(0,0,0,0.02) 20px);
+            z-index: 0; pointer-events: none;
         }
 
-        .content-area { padding: 40px; position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: center; }
-        
-        .visual-area { 
-            background: #f0f9ff; 
-            border-left: var(--comic-border); 
-            position: relative; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center;
-            overflow: hidden;
+        .content-col { padding: 40px; position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: center; }
+        .visual-col { 
+            background: #f1f5f9; border-left: var(--border); position: relative; 
+            display: flex; align-items: center; justify-content: center; overflow: hidden; flex-direction: column;
         }
 
-        /* 漫画气泡 */
+        /* 气泡与标题 */
         .speech-bubble {
-            background: white;
-            border: 2px solid black;
-            border-radius: 20px;
-            padding: 15px;
-            position: relative;
-            margin-bottom: 20px;
-            box-shadow: 3px 3px 0 rgba(0,0,0,0.1);
-            font-weight: bold;
+            background: #fff; border: 2px solid #000; border-radius: 15px; padding: 15px;
+            margin-bottom: 20px; position: relative; box-shadow: 4px 4px 0 rgba(0,0,0,0.1); font-weight: bold;
         }
         .speech-bubble::after {
             content: ''; position: absolute; bottom: -10px; left: 20px;
-            border-width: 10px 10px 0; border-style: solid; border-color: black transparent;
-            display: block; width: 0;
+            border-width: 10px 10px 0; border-style: solid; border-color: #000 transparent;
         }
+        
+        .comic-title { font-family: 'Bangers'; font-size: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; line-height: 1; }
+        .text-danger { color: var(--danger); }
+        .text-success { color: var(--success); }
+        .text-accent { color: var(--accent); }
 
-        /* 标题样式 */
-        .comic-title {
-            font-family: 'Bangers', cursive;
-            font-size: 2.5rem;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
+        /* --- 视觉元素：架构动画 --- */
+        .arch-node {
+            position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-weight: bold; font-size: 0.8rem; color: white; box-shadow: 0 0 10px rgba(0,0,0,0.3); z-index: 2;
         }
-        .comic-title i { margin-right: 10px; }
-        .comic-title.danger { color: var(--danger); }
-        .comic-title.success { color: var(--success); }
-        .comic-title.warn { color: var(--accent); }
+        .node-master { width: 80px; height: 80px; background: var(--danger); top: 50%; left: 50%; transform: translate(-50%,-50%); }
+        .node-worker { width: 50px; height: 50px; background: var(--success); transition: all 0.3s; }
+        .data-dot { position: absolute; width: 8px; height: 8px; border-radius: 50%; pointer-events: none; z-index: 1; }
 
-        /* --- 仪表盘与互动元素 --- */
-        .gauge-container {
-            width: 200px; height: 100px;
-            background: #e2e8f0;
-            border-radius: 100px 100px 0 0;
-            position: relative;
-            overflow: hidden;
-            border: 2px solid #333;
-            margin: 0 auto;
+        /* --- 视觉元素：仪表盘 --- */
+        .gauge-wrap { width: 160px; text-align: center; margin: 10px; }
+        .gauge-body {
+            width: 160px; height: 80px; background: #ddd; border-radius: 80px 80px 0 0; position: relative;
+            overflow: hidden; border: 2px solid #000;
         }
-        .gauge-fill {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: conic-gradient(from 180deg, var(--success) 0deg, var(--accent) 120deg, var(--danger) 180deg);
-            transform-origin: center bottom;
-            border-radius: 100px 100px 0 0;
-        }
-        .gauge-cover {
-            position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
-            width: 140px; height: 70px; background: #f0f9ff; border-radius: 70px 70px 0 0;
-            display: flex; align-items: flex-end; justify-content: center;
-            padding-bottom: 10px; font-weight: bold; font-family: 'Bangers'; font-size: 1.5rem;
+        .gauge-gradient {
+            width: 100%; height: 100%; position: absolute; top: 0; left: 0;
+            background: conic-gradient(from 180deg, #10b981 0deg, #f59e0b 100deg, #ef4444 180deg);
         }
         .gauge-needle {
-            position: absolute; bottom: 0; left: 50%; width: 4px; height: 90px;
-            background: black; transform-origin: bottom center;
-            transform: rotate(-90deg); transition: transform 0.5s cubic-bezier(0.4, 2, 0.55, 0.44);
+            width: 4px; height: 70px; background: #000; position: absolute; bottom: 0; left: 50%;
+            transform-origin: bottom center; transform: rotate(-90deg); transition: transform 0.2s cubic-bezier(0.1, 1.5, 0.2, 1);
+        }
+        .gauge-val { font-family: 'Bangers'; font-size: 1.5rem; margin-top: 5px; }
+
+        /* --- 视觉元素：IDE --- */
+        .ide-box { background: #1e1e1e; width: 90%; border-radius: 10px; overflow: hidden; border: 2px solid #000; color: #fff; }
+        .ide-head { background: #333; padding: 10px; display: flex; gap: 10px; }
+        .ide-tab { padding: 5px 15px; font-size: 0.8rem; cursor: pointer; color: #aaa; }
+        .ide-tab.active { background: var(--primary); color: #fff; border-radius: 4px; }
+        .ide-code { padding: 15px; font-family: 'Consolas', monospace; font-size: 0.9rem; min-height: 150px; color: #d4d4d4; }
+        .c-kw { color: #569cd6; } .c-str { color: #ce9178; } .c-com { color: #6a9955; }
+        
+        /* --- 导航栏 --- */
+        .nav-bar {
+            position: sticky; top: 20px; z-index: 100; display: flex; justify-content: center; gap: 15px; margin-bottom: -40px;
         }
 
-        .stat-box {
-            background: #fff; border: 2px solid #000; padding: 10px; margin-top: 10px;
-            font-family: monospace; font-size: 0.9rem;
-        }
-
-        /* --- 模式切换 --- */
-        .mode-switcher {
-            position: absolute; top: 20px; right: 20px; z-index: 100;
-            display: flex; gap: 10px;
-        }
-
-        /* --- 响应式 --- */
+        /* 响应式 */
         @media (max-width: 900px) {
             .comic-panel { grid-template-columns: 1fr; }
-            .visual-area { height: 300px; border-left: none; border-top: var(--comic-border); }
-            .hero h1 { font-size: 3rem; }
+            .visual-col { height: 300px; border-left: none; border-top: var(--border); }
         }
     </style>
 </head>
@@ -197,85 +134,47 @@
 
     <canvas id="canvas-bg"></canvas>
 
-    <div class="mode-switcher">
-        <button class="btn active" onclick="switchMode('story')" id="btn-story">📖 漫画故事模式</button>
-        <button class="btn" onclick="switchMode('tech')" id="btn-tech">⚙️ 技术极客模式</button>
+    <div class="nav-bar">
+        <button class="btn active" onclick="setMode('story')" id="btn-story">📖 漫画故事模式</button>
+        <button class="btn" onclick="setMode('tech')" id="btn-tech">⚙️ 极客架构模式</button>
     </div>
 
-    <div class="hero">
-        <div style="font-family: 'Bangers'; font-size: 2rem; color: var(--accent); margin-bottom: 10px;">ALLUXIO PRESENTS</div>
-        <h1>112核巨人的<br>图书馆大冒险</h1>
-        <p>面对 100PB 数据、冷读突击检查和“手滑”风险，我们如何突围？</p>
-        <div style="margin-top: 30px;">
-            <i class="fas fa-chevron-down fa-bounce" style="font-size: 2rem;"></i>
-        </div>
+    <div style="height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white;">
+        <div style="font-family: 'Bangers'; font-size: 2rem; color: var(--accent);">EPISODE 1: THE DATA AVALANCHE</div>
+        <h1 style="font-family: 'Bangers'; font-size: 4rem; margin: 10px 0; text-shadow: 4px 4px 0 #3b82f6;">巨人图书馆的进化史</h1>
+        <p style="font-size: 1.2rem; max-width: 600px; color: #ddd;">
+            当 300PB 数据遇上 10 万并发任务，<br>以及一位患有“手滑症”的 112 核巨人管理员。
+        </p>
+        <i class="fas fa-chevron-down fa-bounce" style="margin-top: 40px; font-size: 2rem;"></i>
     </div>
 
     <div class="section">
         <div class="comic-panel">
             <div class="speed-lines"></div>
-            
-            <div class="content-area">
-                <h2 class="comic-title warn" id="title-handles"><i class="fas fa-hand-paper"></i> 危机一：手不够用了！</h2>
+            <div class="content-col">
+                <h2 class="comic-title text-danger" id="t1-title">🔥 危机：图书馆大拥堵</h2>
                 
-                <div id="text-handles-story" class="fade-in">
+                <div id="t1-story" class="fade-in">
                     <div class="speech-bubble">
                         <i class="fas fa-quote-left"></i> 
-                        我是这里的管理员“大力神”（112核服务器）。我力气很大，但老板有个死规定：
-                        <span style="color:var(--danger)">手里最多只能拿 1000 本书！</span>
+                        我是旧管理员 JFS。以前每天来几百人还行，今天突然来了 <strong>10万人</strong>！他们全挤在门口问我：“《机器人日记》在哪？”
                     </div>
-                    <p>
-                        <strong>现在的尴尬 (JFS)：</strong> 为了找书快，我不得不手里时刻捏着 800 多张索引卡（句柄）。
-                        稍微来点新任务，我就要破戒了！一旦超过 1000，我就会手滑，任务全崩。
-                    </p>
+                    <p><strong>现状：</strong> 所有人都要经过我这个“总管”查目录。我嗓子喊哑了，大厅还是堵死了。</p>
+                    <p><strong>后果：</strong> 业务全线瘫痪，机器人都在排队等待。</p>
                 </div>
 
-                <div id="text-handles-tech" class="hidden fade-in">
-                    <div class="speech-bubble" style="font-family: monospace; border-color: var(--primary);">
-                        $ ulimit -n 1000
+                <div id="t1-tech" class="hidden fade-in">
+                    <div class="speech-bubble" style="border-color: var(--primary);">
+                        Bottleneck: Centralized Metadata
                     </div>
-                    <ul style="line-height: 1.8;">
-                        <li><strong>Server Specs:</strong> 112 Core (高密计算节点), 100PB UFS。</li>
-                        <li><strong>Risk:</strong> 节点 Max Open Files 限制为 1000。当前 JFS 进程常驻占用 ~800 句柄。</li>
-                        <li><strong>Bottleneck:</strong> 高并发下极易触发 `Too many open files`，导致 Pod 崩溃。Alluxio 必须证明句柄占用更低。</li>
-                    </ul>
-                </div>
-
-                <div style="margin-top: 20px;">
-                    <button class="btn" onclick="simHandles()">💥 压力测试：加负载！</button>
+                    <p><strong>JFS 架构痛点：</strong> Master 节点是单点瓶颈。在 10 万+ 并发连接下，Master 的 QPS 达到极限，Open/Lookup 请求大量超时。</p>
+                    <p><strong>运维困境：</strong> 为了缓解压力，被迫物理拆分多个集群，导致数据孤岛。</p>
                 </div>
             </div>
-
-            <div class="visual-area" style="flex-direction: column; background: #fff5f5;">
-                <div style="position: absolute; top: 10px; left: 10px; font-weight: bold;">FILE HANDLES MONITOR</div>
-                
-                <div style="display: flex; gap: 30px; margin-top: 20px;">
-                    <div style="text-align: center;">
-                        <div style="font-weight: bold; margin-bottom: 5px; color: var(--danger);">JFS (Current)</div>
-                        <div class="gauge-container">
-                            <div class="gauge-fill"></div>
-                            <div class="gauge-cover">
-                                <span id="val-jfs">800</span>
-                            </div>
-                            <div class="gauge-needle" id="needle-jfs" style="transform: rotate(45deg);"></div>
-                        </div>
-                        <div class="stat-box" id="status-jfs">Status: High Risk</div>
-                    </div>
-
-                    <div style="text-align: center;">
-                        <div style="font-weight: bold; margin-bottom: 5px; color: var(--success);">Alluxio SDK</div>
-                        <div class="gauge-container">
-                            <div class="gauge-fill"></div>
-                            <div class="gauge-cover">
-                                <span id="val-alluxio">150</span>
-                            </div>
-                            <div class="gauge-needle" id="needle-alluxio" style="transform: rotate(-60deg);"></div>
-                        </div>
-                        <div class="stat-box" id="status-alluxio">Status: Safe</div>
-                    </div>
-                </div>
-                <div style="margin-top: 20px; font-size: 0.8rem; color: #666; text-align: center; padding: 0 20px;">
-                    * Alluxio SDK 通过复用连接和无 FUSE 设计，<br>显著降低句柄占用。
+            
+            <div class="visual-col" id="viz-arch">
+                <div style="position: absolute; bottom: 10px; font-weight: bold; background: white; padding: 5px 10px; border: 2px solid black;">
+                    阻塞率: <span id="val-block" class="text-danger">0%</span>
                 </div>
             </div>
         </div>
@@ -284,229 +183,389 @@
     <div class="section">
         <div class="comic-panel" style="border-color: var(--primary);">
             <div class="speed-lines"></div>
-            
-            <div class="visual-area" style="background: #f0fdff; flex-direction: column;">
-                <div style="font-size: 5rem; margin-bottom: -10px;"><i class="fas fa-stopwatch"></i></div>
-                <h3 style="font-family: 'Bangers'; margin: 10px;">TIME TO FIRST BYTE</h3>
+            <div class="visual-col" style="background: #eef2ff; padding: 20px;">
                 
-                <div style="width: 80%; margin-top: 20px;">
-                    <div style="display: flex; justify-content: space-between; font-weight: bold;">
-                        <span>JFS (Via Master)</span>
-                        <span id="time-jfs">Waiting...</span>
+                <div style="font-weight: bold; margin-bottom: 10px;">Monitor: File Handles</div>
+                <div style="display: flex; flex-wrap: wrap; justify-content: center;">
+                    <div class="gauge-wrap">
+                        <div class="gauge-body"><div class="gauge-gradient"></div><div class="gauge-needle" id="ndl-jfs"></div></div>
+                        <div class="gauge-val text-danger" id="val-jfs">850</div>
+                        <small>JFS (High Risk)</small>
                     </div>
-                    <div style="height: 20px; background: #ddd; border: 2px solid black; margin-bottom: 15px;">
-                        <div id="bar-cold-jfs" style="width: 0%; height: 100%; background: var(--danger); transition: width 2s linear;"></div>
-                    </div>
-
-                    <div style="display: flex; justify-content: space-between; font-weight: bold;">
-                        <span>Alluxio (Hash Direct)</span>
-                        <span id="time-alluxio">Waiting...</span>
-                    </div>
-                    <div style="height: 20px; background: #ddd; border: 2px solid black;">
-                        <div id="bar-cold-alluxio" style="width: 0%; height: 100%; background: var(--success); transition: width 0.5s linear;"></div>
+                    <div class="gauge-wrap">
+                        <div class="gauge-body"><div class="gauge-gradient"></div><div class="gauge-needle" id="ndl-all"></div></div>
+                        <div class="gauge-val text-success" id="val-all">150</div>
+                        <small>Alluxio</small>
                     </div>
                 </div>
-                
-                <button class="btn" style="margin-top: 30px; background: var(--primary); color: white;" onclick="simColdRead()">🏁 开始突击检查</button>
+                <button class="btn" style="margin: 20px 0; font-size: 1rem;" onclick="simStress()">💥 加压测试</button>
+
+                <div style="width: 100%; border-top: 2px dashed #ccc; margin-top: 10px; padding-top: 20px;">
+                    <div style="font-weight: bold; margin-bottom: 10px;">Cold Read Latency (突击检查)</div>
+                    
+                    <div style="display: flex; align-items: center; margin-bottom: 5px;">
+                        <span style="width: 50px; font-size: 0.8rem;">JFS:</span>
+                        <div style="flex: 1; height: 15px; background: #ddd; border: 1px solid #000;">
+                            <div id="bar-jfs" style="width: 0%; height: 100%; background: var(--danger); transition: width 1.5s linear;"></div>
+                        </div>
+                        <span style="width: 50px; font-size: 0.8rem; text-align: right;" id="txt-jfs">Wait</span>
+                    </div>
+
+                    <div style="display: flex; align-items: center;">
+                        <span style="width: 50px; font-size: 0.8rem;">Alluxio:</span>
+                        <div style="flex: 1; height: 15px; background: #ddd; border: 1px solid #000;">
+                            <div id="bar-all" style="width: 0%; height: 100%; background: var(--success); transition: width 0.3s cubic-bezier(0,1.5,.5,1);"></div>
+                        </div>
+                        <span style="width: 50px; font-size: 0.8rem; text-align: right;" id="txt-all">Wait</span>
+                    </div>
+                    <button class="btn" style="margin-top: 10px; font-size: 0.9rem; background: var(--primary); color: white;" onclick="simRace()">🏁 开始冷读</button>
+                </div>
+
             </div>
 
-            <div class="content-area">
-                <h2 class="comic-title warn" id="title-cold"><i class="fas fa-question-circle"></i> 危机二：突击检查！</h2>
+            <div class="content-col">
+                <h2 class="comic-title text-accent" id="t2-title">😰 危机：巨人手滑与突击检查</h2>
                 
-                <div id="text-cold-story" class="fade-in">
+                <div id="t2-story" class="fade-in">
+                    <p><strong>主角：</strong> 一位名叫“大力神”的管理员（112核服务器）。</p>
                     <div class="speech-bubble">
-                        <i class="fas fa-quote-left"></i> 
-                        老师从来不划重点！所有考试都是“突击检查”（无法预热）。
+                        <i class="fas fa-hand-paper"></i> 
+                        <span class="text-danger">手不够用了！</span> 老板规定我手里只能拿 1000 本书（句柄）。JFS 模式下，我为了快，时刻捏着 800 多本。稍微多来点任务，我就要手滑崩盘了！
                     </div>
-                    <p>
-                        <strong>JFS 的做法：</strong> 每次想找书，得先跑去问总管“书在哪”，总管翻账本半天，我再去书架拿。这中间的跑腿时间（Latency）太长了！
-                    </p>
-                    <p>
-                        <strong>Alluxio 的绝招：</strong> 我有“心灵感应”（一致性哈希）。只要知道书名，我就能直接算出书在哪个窗口，<span style="background:yellow">不用问总管，直接拿书！</span>
-                    </p>
+                    <div class="speech-bubble">
+                        <i class="fas fa-stopwatch"></i> 
+                        <span class="text-danger">突击检查太慢！</span> 每次找新书（冷读），我都得先跑去问总管。这跑腿时间太长，机器人都在等我。
+                    </div>
+                    <p><strong>Alluxio 救场：</strong> 轻量级平板（SDK）不用一直捏着书；心灵感应（Hash）让我不用问总管直接取书。</p>
                 </div>
 
-                <div id="text-cold-tech" class="hidden fade-in">
-                    <div class="speech-bubble" style="font-family: monospace; border-color: var(--primary);">
-                        Pattern: Random Cold Read
-                    </div>
-                    <ul style="line-height: 1.8;">
-                        <li><strong>Scenario:</strong> 无法使用 Job Load 预热。所有读取均为 Cold Read。</li>
-                        <li><strong>Challenge:</strong> 必须最小化 Metadata Lookup 延时。</li>
-                        <li><strong>Solution (DORA):</strong> 
-                            <br>JFS: Client -> Master (Lookup) -> Client -> ChunkServer。
-                            <br>Alluxio: Client -> Hash(Filename) -> Worker。
-                            <br><strong>省去一次 RTT</strong>，首字节延迟显著降低。
-                        </li>
+                <div id="t2-tech" class="hidden fade-in">
+                    <p><strong>Constraint 1: File Handles</strong></p>
+                    <ul style="font-size: 0.9rem;">
+                        <li><strong>Limit:</strong> `ulimit -n 1000` per Node.</li>
+                        <li><strong>Risk:</strong> JFS 进程常驻占用 ~850 句柄，接近崩溃阈值。</li>
+                        <li><strong>Solution:</strong> Alluxio SDK 无 FUSE 依赖，连接复用，句柄占用 < 200。</li>
+                    </ul>
+                    <p><strong>Constraint 2: Cold Read Latency</strong></p>
+                    <ul style="font-size: 0.9rem;">
+                        <li><strong>Challenge:</strong> 无法预热 (No Job Load)。</li>
+                        <li><strong>Optimization:</strong> DORA 架构去除了 Master Lookup 的 RTT。客户端通过 Hash 直接定位 Worker，首字节延迟降低 60%。</li>
                     </ul>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="section" style="padding-top: 0;">
-        <div style="text-align: center; max-width: 800px; background: rgba(0,0,0,0.8); padding: 40px; border-radius: 20px; border: 2px solid var(--accent); color: white;">
-            <h2 style="font-family: 'Bangers'; color: var(--accent); font-size: 3rem;">结局：肌肉巨人的解放</h2>
-            <p style="font-size: 1.2rem;">通过 Alluxio DORA 架构，我们不仅保住了“1000 句柄”的生命线，还让 112 核的算力彻底释放。</p>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 30px; text-align: left;">
-                <div style="background: #333; padding: 15px; border-radius: 10px;">
-                    <div style="color: var(--success); font-weight: bold;"><i class="fas fa-check"></i> 安全</div>
-                    句柄占用降低 80%，远离崩溃红线。
+    <div class="section">
+        <div class="comic-panel">
+            <div class="speed-lines"></div>
+            <div class="content-col">
+                <h2 class="comic-title text-success" id="t3-title">🚀 进化：智能平板时代</h2>
+                
+                <div id="t3-story" class="fade-in">
+                    <p>以前，每个学生要看书都得先去办一张“实体借书证”（FUSE挂载），流程繁琐，还容易把系统搞挂。</p>
+                    <p>现在，Alluxio 给每人发了一个<strong>“Python 智能平板”</strong> (SDK)。</p>
+                    <ul style="list-style: none; padding: 0;">
+                        <li>✅ <strong>免办证：</strong> 不用挂载，直接运行。</li>
+                        <li>✅ <strong>极速翻页：</strong> 原生支持 MCAP 的跳页（Seek）功能。</li>
+                        <li>✅ <strong>更省电：</strong> 不消耗系统 CPU 去做格式转换。</li>
+                    </ul>
                 </div>
-                <div style="background: #333; padding: 15px; border-radius: 10px;">
-                    <div style="color: var(--success); font-weight: bold;"><i class="fas fa-bolt"></i> 极速</div>
-                    冷读去除元数据交互，延迟降低 60%。
+
+                <div id="t3-tech" class="hidden fade-in">
+                    <p><strong>FUSE vs SDK:</strong></p>
+                    <ul style="font-size: 0.9rem;">
+                        <li><strong>Legacy (FUSE):</strong> User Space -> Kernel (VFS/FUSE) -> User Space. 上下文切换消耗大量 CPU，导致 112 核算力浪费。</li>
+                        <li><strong>Next-Gen (SDK):</strong> 纯用户态直连。Zero-Copy。</li>
+                    </ul>
+                    <p><strong>MCAP Optimization:</strong></p>
+                    <p style="font-size: 0.9rem;">SDK 原生支持 HTTP Range Request 语义，完美适配 MCAP 的 `Message Index` 随机读取模式。</p>
                 </div>
-                <div style="background: #333; padding: 15px; border-radius: 10px;">
-                    <div style="color: var(--success); font-weight: bold;"><i class="fas fa-server"></i> 高效</div>
-                    SDK 零拷贝，跑满 112 Core 吞吐。
+            </div>
+
+            <div class="visual-col" style="background: #252526; display: block; padding: 0;">
+                <div class="ide-box" style="margin: 20px auto; width: 90%;">
+                    <div class="ide-head">
+                        <div class="ide-tab active" onclick="switchCode('jfs')" id="tab-jfs">Legacy (JFS)</div>
+                        <div class="ide-tab" onclick="switchCode('all')" id="tab-all">Modern (Alluxio)</div>
+                    </div>
+                    <div class="ide-code" id="code-area">
+                        </div>
+                    <div style="background: #111; padding: 10px; font-family: monospace; font-size: 0.8rem; color: #0f0; border-top: 1px solid #333; height: 60px;" id="console-log">
+                        > Ready...
+                    </div>
+                </div>
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <button class="btn" onclick="runCode()" style="font-size: 1rem;">▶ 运行仿真</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="section" style="padding-top: 0;">
+        <div style="background: var(--comic-white); border: var(--border); padding: 40px; border-radius: 20px; text-align: center; max-width: 800px; box-shadow: 10px 10px 0 rgba(0,0,0,0.5);">
+            <h2 class="comic-title">🏆 最终战报</h2>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-family: 'Noto Sans SC';">
+                <tr style="background: #eee;">
+                    <th style="padding: 10px; border: 1px solid #000;">挑战</th>
+                    <th style="padding: 10px; border: 1px solid #000;">JFS (旧时代)</th>
+                    <th style="padding: 10px; border: 1px solid #000; color: var(--primary);">Alluxio DORA (新时代)</th>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #000; font-weight: bold;">宏观架构</td>
+                    <td style="padding: 10px; border: 1px solid #000; color: var(--danger);">中心化总管 (堵死)</td>
+                    <td style="padding: 10px; border: 1px solid #000; color: var(--success);">去中心化 (线性扩展)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #000; font-weight: bold;">句柄风险</td>
+                    <td style="padding: 10px; border: 1px solid #000; color: var(--danger);">高 (接近 1000 崩溃线)</td>
+                    <td style="padding: 10px; border: 1px solid #000; color: var(--success);">低 (连接复用 < 200)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px; border: 1px solid #000; font-weight: bold;">冷读速度</td>
+                    <td style="padding: 10px; border: 1px solid #000;">慢 (需查询元数据)</td>
+                    <td style="padding: 10px; border: 1px solid #000; color: var(--success);">快 (Hash 直连无 RTT)</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
     <script>
-        // --- 动态背景逻辑 ---
-        const canvas = document.getElementById('canvas-bg');
-        const ctx = canvas.getContext('2d');
-        let w, h, particles = [];
+        // --- 1. 全局状态控制 ---
+        let mode = 'story';
         
-        function initCanvas() {
-            w = canvas.width = window.innerWidth;
-            h = canvas.height = window.innerHeight;
-            particles = Array.from({length: 50}, () => ({
-                x: Math.random() * w, y: Math.random() * h,
-                vx: (Math.random() - 0.5) * 2, vy: (Math.random() - 0.5) * 2,
-                size: Math.random() * 30 + 10,
-                color: ['#3b82f6', '#10b981', '#f59e0b'][Math.floor(Math.random()*3)]
-            }));
-        }
-        window.onresize = initCanvas;
-        initCanvas();
-
-        function animateBg() {
-            ctx.clearRect(0, 0, w, h);
-            particles.forEach(p => {
-                p.x += p.vx; p.y += p.vy;
-                if (p.x < 0 || p.x > w) p.vx *= -1;
-                if (p.y < 0 || p.y > h) p.vy *= -1;
-                
-                // 绘制漫画风格的气泡点
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fillStyle = p.color;
-                ctx.globalAlpha = 0.1;
-                ctx.fill();
-                ctx.strokeStyle = '#000';
-                ctx.lineWidth = 1;
-                ctx.globalAlpha = 0.05;
-                ctx.stroke();
-            });
-            requestAnimationFrame(animateBg);
-        }
-        animateBg();
-
-
-        // --- 业务逻辑 ---
-
-        function switchMode(mode) {
-            const isStory = mode === 'story';
+        function setMode(m) {
+            mode = m;
+            // 按钮样式
+            document.getElementById('btn-story').className = m === 'story' ? 'btn active' : 'btn';
+            document.getElementById('btn-tech').className = m === 'tech' ? 'btn active' : 'btn';
             
-            // 按钮状态
-            document.getElementById('btn-story').className = isStory ? 'btn active' : 'btn';
-            document.getElementById('btn-tech').className = isStory ? 'btn' : 'btn active';
-
-            // 内容切换
-            toggle('text-handles-story', isStory);
-            toggle('text-handles-tech', !isStory);
-            toggle('text-cold-story', isStory);
-            toggle('text-cold-tech', !isStory);
-
-            // 标题更新
-            document.getElementById('title-handles').innerHTML = isStory ? 
-                '<i class="fas fa-hand-paper"></i> 危机一：手不够用了！' : 
-                '<i class="fas fa-microchip"></i> 风险：文件句柄耗尽';
+            // 文本切换
+            const storyEls = document.querySelectorAll('[id$="-story"]');
+            const techEls = document.querySelectorAll('[id$="-tech"]');
             
-            document.getElementById('title-cold').innerHTML = isStory ? 
-                '<i class="fas fa-question-circle"></i> 危机二：突击检查！' : 
-                '<i class="fas fa-thermometer-empty"></i> 挑战：冷读首字节延迟';
+            storyEls.forEach(el => el.classList.toggle('hidden', m !== 'story'));
+            techEls.forEach(el => el.classList.toggle('hidden', m !== 'tech'));
+
+            // 标题更新 (示例)
+            document.getElementById('t1-title').innerText = m === 'story' ? "🔥 危机：图书馆大拥堵" : "⚠️ Architecture Bottleneck";
+            document.getElementById('t2-title').innerText = m === 'story' ? "😰 危机：巨人手滑与突击检查" : "⚠️ Resource & Latency Constraints";
+            document.getElementById('t3-title').innerText = m === 'story' ? "🚀 进化：智能平板时代" : "💻 SDK Integration & Zero-Copy";
+            
+            // 更新可视化区域的标签
+            resetVisuals();
         }
 
-        function toggle(id, show) {
-            const el = document.getElementById(id);
-            if(show) { el.classList.remove('hidden'); el.classList.add('fade-in'); }
-            else { el.classList.add('hidden'); }
+        function resetVisuals() {
+            // 重置动画状态
+            document.getElementById('viz-arch').innerHTML = '<div style="position: absolute; bottom: 10px; font-weight: bold; background: white; padding: 5px 10px; border: 2px solid black;">Status: <span id="val-block" class="text-danger">Idle</span></div>';
+            startArchAnim(); // 重启架构动画
         }
 
-        // 模拟：句柄压力测试
-        function simHandles() {
-            // JFS 模拟：飙升并抖动
-            const nJfs = document.getElementById('needle-jfs');
-            const vJfs = document.getElementById('val-jfs');
-            const sJfs = document.getElementById('status-jfs');
+        // --- 2. 架构动画 (JFS vs Alluxio) ---
+        function startArchAnim() {
+            const container = document.getElementById('viz-arch');
+            // 清空
+            const status = container.querySelector('div');
             
-            // Alluxio 模拟：平稳
-            const nAll = document.getElementById('needle-alluxio');
-            const vAll = document.getElementById('val-alluxio');
-            const sAll = document.getElementById('status-alluxio');
+            // 创建中心节点 (Master) 或 分布式节点 (Workers)
+            // 这里为了简化，我们做一个循环展示：先展示 JFS 拥堵，再展示 Alluxio 流畅
+            
+            let isJfsPhase = true;
+            let nodes = [];
+            
+            function setupPhase() {
+                // 清理旧点
+                const oldDots = container.querySelectorAll('.data-dot');
+                oldDots.forEach(d => d.remove());
+                const oldNodes = container.querySelectorAll('.arch-node');
+                oldNodes.forEach(n => n.remove());
 
-            let step = 0;
+                if (isJfsPhase) {
+                    // JFS: Center Master
+                    const master = document.createElement('div');
+                    master.className = 'arch-node node-master';
+                    master.innerText = mode === 'story' ? "总管" : "Master";
+                    container.appendChild(master);
+                    document.getElementById('val-block').innerText = "Congested (JFS)";
+                    document.getElementById('val-block').className = "text-danger";
+                } else {
+                    // Alluxio: Ring
+                    for(let i=0; i<5; i++) {
+                        const w = document.createElement('div');
+                        w.className = 'arch-node node-worker';
+                        w.innerText = mode === 'story' ? "窗口" : "W" + i;
+                        const angle = (i/5)*Math.PI*2;
+                        w.style.left = (50 + 35*Math.cos(angle)) + '%';
+                        w.style.top = (50 + 35*Math.sin(angle)) + '%';
+                        w.style.transform = "translate(-50%, -50%)";
+                        container.appendChild(w);
+                    }
+                    document.getElementById('val-block').innerText = "Smooth (Alluxio)";
+                    document.getElementById('val-block').className = "text-success";
+                }
+            }
+
+            setupPhase();
+
+            // 发射粒子
             const interval = setInterval(() => {
-                step++;
-                
-                // JFS Logic (0 to 90 deg is full) -> mapped to -90 to 90
-                // 模拟危险波动：800 -> 980
-                let rawJfs = 800 + Math.random() * 180;
-                if(rawJfs > 1000) rawJfs = 1000;
-                // Mapping: 0->-90deg, 500->0deg, 1000->90deg
-                let degJfs = ((rawJfs / 1000) * 180) - 90;
-                nJfs.style.transform = `rotate(${degJfs}deg)`;
-                vJfs.innerText = Math.floor(rawJfs);
+                const dot = document.createElement('div');
+                dot.className = 'data-dot';
+                // 随机边缘
+                dot.style.left = Math.random() < 0.5 ? '0%' : '100%';
+                dot.style.top = Math.random() * 100 + '%';
+                dot.style.background = isJfsPhase ? '#ef4444' : '#10b981';
+                container.appendChild(dot);
 
-                if(rawJfs > 950) {
-                    sJfs.innerText = "CRITICAL ALERT!";
-                    sJfs.style.background = "var(--danger)";
-                    sJfs.style.color = "white";
+                let tx, ty;
+                if(isJfsPhase) {
+                    tx = container.offsetWidth / 2;
+                    ty = container.offsetHeight / 2;
+                } else {
+                    // 随机去某个 Worker
+                    const angle = (Math.floor(Math.random()*5)/5)*Math.PI*2;
+                    tx = container.offsetWidth/2 + (container.offsetWidth*0.35)*Math.cos(angle);
+                    ty = container.offsetHeight/2 + (container.offsetHeight*0.35)*Math.sin(angle);
                 }
 
-                // Alluxio Logic: Stable around 150
-                let rawAll = 150 + Math.random() * 20;
-                let degAll = ((rawAll / 1000) * 180) - 90;
-                nAll.style.transform = `rotate(${degAll}deg)`;
-                vAll.innerText = Math.floor(rawAll);
+                const anim = dot.animate([
+                    { transform: 'translate(0,0)' },
+                    { transform: `translate(${tx - dot.offsetLeft}px, ${ty - dot.offsetTop}px)` }
+                ], { duration: isJfsPhase ? 1500 : 800, easing: 'linear' });
 
-                if(step > 20) clearInterval(interval);
+                anim.onfinish = () => {
+                    dot.remove();
+                    if(isJfsPhase) {
+                        const m = container.querySelector('.node-master');
+                        if(m) m.style.transform = `translate(-50%, -50%) scale(${1+Math.random()*0.2})`;
+                    }
+                };
             }, 100);
+
+            // 每 5 秒切换一次场景
+            setInterval(() => {
+                isJfsPhase = !isJfsPhase;
+                setupPhase();
+            }, 5000);
         }
 
-        // 模拟：冷读竞速
-        function simColdRead() {
-            const barJfs = document.getElementById('bar-cold-jfs');
-            const txtJfs = document.getElementById('time-jfs');
-            const barAll = document.getElementById('bar-cold-alluxio');
-            const txtAll = document.getElementById('time-alluxio');
+        // --- 3. 仪表盘加压 ---
+        function simStress() {
+            const ndlJ = document.getElementById('ndl-jfs');
+            const txtJ = document.getElementById('val-jfs');
+            const ndlA = document.getElementById('ndl-all');
+            const txtA = document.getElementById('val-all');
+
+            let step = 0;
+            const timer = setInterval(() => {
+                step++;
+                // JFS: 800 -> 980 (Shake)
+                let vJ = 800 + Math.random() * 190; 
+                if(vJ > 1000) vJ = 1000;
+                let degJ = ((vJ/1000)*180) - 90;
+                ndlJ.style.transform = `rotate(${degJ}deg)`;
+                txtJ.innerText = Math.floor(vJ);
+                
+                // Alluxio: Stable ~150
+                let vA = 150 + Math.random() * 10;
+                let degA = ((vA/1000)*180) - 90;
+                ndlA.style.transform = `rotate(${degA}deg)`;
+                txtA.innerText = Math.floor(vA);
+
+                if(step > 30) clearInterval(timer);
+            }, 50);
+        }
+
+        // --- 4. 冷读竞速 ---
+        function simRace() {
+            const bJ = document.getElementById('bar-jfs');
+            const bA = document.getElementById('bar-all');
+            const tJ = document.getElementById('txt-jfs');
+            const tA = document.getElementById('txt-all');
 
             // Reset
-            barJfs.style.width = '0%'; barJfs.style.transition = 'none';
-            barAll.style.width = '0%'; barAll.style.transition = 'none';
-            txtJfs.innerText = 'Connecting...'; txtAll.innerText = 'Hashing...';
+            bJ.style.width = '0%'; bJ.style.transition = 'none';
+            bA.style.width = '0%'; bA.style.transition = 'none';
+            tJ.innerText = 'Wait'; tA.innerText = 'Wait';
 
             setTimeout(() => {
-                // Alluxio starts fast
-                barAll.style.transition = 'width 0.4s ease-out';
-                barAll.style.width = '100%';
-                setTimeout(() => txtAll.innerText = 'Done (40ms)', 400);
+                // Alluxio fast
+                bA.style.transition = 'width 0.4s cubic-bezier(0,1.5,.5,1)';
+                bA.style.width = '100%';
+                setTimeout(() => tA.innerText = '40ms', 400);
 
-                // JFS starts slow (Master Lookup)
-                barJfs.style.transition = 'width 1.5s ease-in-out';
-                barJfs.style.width = '100%';
-                
-                setTimeout(() => {
-                    txtJfs.innerText = 'Done (150ms)';
-                }, 1500);
+                // JFS slow
+                bJ.style.transition = 'width 1.5s linear';
+                bJ.style.width = '100%';
+                setTimeout(() => tJ.innerText = '150ms', 1500);
             }, 100);
         }
+
+        // --- 5. 代码模拟 ---
+        let codeMode = 'jfs';
+        const cJfs = `<span class="c-com"># JFS (FUSE) - 伪代码</span>
+<span class="c-kw">import</span> os
+<span class="c-com"># 1. 依赖 FUSE 挂载 (阻塞, 耗句柄)</span>
+os.system(<span class="c-str">"mount -t juicefs /dev/vdb /mnt"</span>)
+<span class="c-kw">with</span> open(<span class="c-str">"/mnt/file.mcap"</span>, <span class="c-str">"rb"</span>) <span class="c-kw">as</span> f:
+    f.seek(offset) <span class="c-com"># 内核态切换</span>
+    data = f.read(1024)`;
+
+        const cAll = `<span class="c-com"># Alluxio (SDK) - 伪代码</span>
+<span class="c-kw">from</span> alluxio <span class="c-kw">import</span> Client
+<span class="c-com"># 1. 轻量直连 (无 FUSE, 省句柄)</span>
+client = Client(<span class="c-str">"cluster-zs"</span>)
+<span class="c-kw">with</span> client.open(<span class="c-str">"s3://file.mcap"</span>) <span class="c-kw">as</span> f:
+    <span class="c-com"># Hash 直达 Worker</span>
+    data = f.read_range(offset, 1024)`;
+
+        function switchCode(m) {
+            codeMode = m;
+            document.getElementById('tab-jfs').className = m === 'jfs' ? 'ide-tab active' : 'ide-tab';
+            document.getElementById('tab-all').className = m === 'all' ? 'ide-tab active' : 'ide-tab';
+            document.getElementById('code-area').innerHTML = m === 'jfs' ? cJfs : cAll;
+            document.getElementById('console-log').innerText = "> Ready...";
+        }
+
+        function runCode() {
+            const log = document.getElementById('console-log');
+            log.innerText = "> Compiling...";
+            setTimeout(() => {
+                if(codeMode === 'jfs') {
+                    log.innerHTML = "<span style='color:red'>[WARN] High CPU Wait (Context Switch)</span><br>> Done in 1.2s";
+                } else {
+                    log.innerHTML = "<span style='color:#0f0'>[INFO] Zero-Copy Read. Worker Hit.</span><br>> Done in 0.05s";
+                }
+            }, 800);
+        }
+
+        // Init
+        startArchAnim();
+        switchCode('jfs');
+        setMode('story');
+
+        // Canvas BG
+        const cvs = document.getElementById('canvas-bg');
+        const ctx = cvs.getContext('2d');
+        let w, h, parts = [];
+        const resize = () => { w=cvs.width=window.innerWidth; h=cvs.height=window.innerHeight; };
+        window.onresize = resize; resize();
+        
+        for(let i=0; i<60; i++) parts.push({x:Math.random()*w, y:Math.random()*h, vx:(Math.random()-.5), vy:(Math.random()-.5)});
+        
+        function animBg() {
+            ctx.clearRect(0,0,w,h);
+            ctx.fillStyle = '#3b82f6';
+            parts.forEach(p => {
+                p.x+=p.vx; p.y+=p.vy;
+                if(p.x<0||p.x>w) p.vx*=-1; if(p.y<0||p.y>h) p.vy*=-1;
+                ctx.beginPath(); ctx.arc(p.x, p.y, Math.random()*2, 0, Math.PI*2); ctx.fill();
+            });
+            requestAnimationFrame(animBg);
+        }
+        animBg();
+
     </script>
 </body>
 </html>
