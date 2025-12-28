@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>300PB 自动驾驶挖掘：巨人图书馆的进化史 (大结局)</title>
+    <title>地平线 (Horizon) - Alluxio 数据挖掘架构演进报告</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Noto+Sans+SC:wght@400;700&display=swap" rel="stylesheet">
     
@@ -87,6 +87,17 @@
         .text-accent { color: var(--accent); }
         .text-purple { color: var(--purple); }
 
+        /* --- 视觉元素：洞察卡片 (Chapter 6) --- */
+        .insight-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 90%; }
+        .insight-card { 
+            background: white; border: 2px solid #000; padding: 15px; border-radius: 8px; 
+            box-shadow: 4px 4px 0 rgba(0,0,0,0.1); transition: transform 0.3s;
+        }
+        .insight-card:hover { transform: translateY(-5px); }
+        .insight-icon { font-size: 1.5rem; margin-bottom: 10px; }
+        .insight-val { font-family: 'Bangers'; font-size: 1.5rem; color: var(--primary); }
+        .insight-desc { font-size: 0.8rem; color: #666; margin-top: 5px; line-height: 1.4; }
+
         /* --- 视觉元素：架构动画 --- */
         .arch-node {
             position: absolute; border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -127,7 +138,7 @@
         .race-bar-fill { height: 100%; width: 0%; display: flex; align-items: center; justify-content: flex-end; padding-right: 10px; color: white; font-weight: bold; transition: width 1.5s cubic-bezier(0.25, 1, 0.5, 1); }
         .win-flag { display: none; margin-left: 10px; color: var(--accent); font-size: 1.2rem; }
 
-        /* --- 视觉元素：作战地图 (Chapter 5) --- */
+        /* --- 视觉元素：作战地图 --- */
         .mission-map { display: flex; flex-direction: column; gap: 20px; width: 80%; }
         .mission-card { 
             background: white; border: 2px solid #000; padding: 15px; border-radius: 10px; 
@@ -165,10 +176,10 @@
     </div>
 
     <div style="height: 90vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white;">
-        <div style="font-family: 'Bangers'; font-size: 2rem; color: var(--accent);">EPISODE 1: THE DATA AVALANCHE</div>
-        <h1 style="font-family: 'Bangers'; font-size: 4rem; margin: 10px 0; text-shadow: 4px 4px 0 #3b82f6;">巨人图书馆的进化史</h1>
+        <div style="font-family: 'Bangers'; font-size: 2rem; color: var(--accent);">HORIZON ROBOTICS (地平线) CASE STUDY</div>
+        <h1 style="font-family: 'Bangers'; font-size: 4rem; margin: 10px 0; text-shadow: 4px 4px 0 #3b82f6;">数据挖掘架构演进史</h1>
         <p style="font-size: 1.2rem; max-width: 600px; color: #ddd;">
-            当 300PB 数据遇上 10 万并发任务，<br>以及一位患有“手滑症”的 112 核巨人管理员。
+            300PB 数据、10 万并发与 Alluxio 的性能突围
         </p>
         <i class="fas fa-chevron-down fa-bounce" style="margin-top: 40px; font-size: 2rem;"></i>
     </div>
@@ -304,35 +315,17 @@
             
             <div class="content-col">
                 <h2 class="comic-title text-purple" id="t5-title">🗺️ 第五章：宏伟蓝图</h2>
-                
                 <div id="t5-story" class="fade-in">
                     <div class="speech-bubble" style="border-color: var(--purple);">
-                        <i class="fas fa-scroll"></i> 比赛只是开始。现在，我们要改造整座图书馆！
+                        <i class="fas fa-scroll"></i> 比赛只是开始。POC 计划分三步走：换脑手术、魔鬼特训、复制巨人。
                     </div>
-                    <p>我们的作战计划（POC）分三步走：</p>
-                    <ul style="line-height: 2; list-style: none;">
-                        <li><strong>Step 1: 换脑手术</strong> <br> 把机器人的旧芯片（自研 SDK）直接对接 Alluxio，扔掉 FUSE。</li>
-                        <li><strong>Step 2: 魔鬼特训</strong> <br> 模拟冷读（突击检查）和热读（背诵全文），确保万无一失。</li>
-                        <li><strong>Step 3: 复制巨人</strong> <br> 从 1 个巨人扩充到 10 个，甚至更多！</li>
-                    </ul>
                 </div>
-
                 <div id="t5-tech" class="hidden fade-in">
-                    <p><strong>POC Strategy & Roadmap:</strong></p>
-                    <ul style="font-size: 0.9rem; line-height: 1.6;">
-                        <li><strong>Integration:</strong> 将客户自研 SDK 直接调用 Alluxio Python SDK，Bypass FUSE，提供高性能读取。</li>
-                        <li><strong>Scenario Validation:</strong> 
-                            <ul>
-                                <li><strong>Single Topic:</strong> 7.3GB, 150k msgs (Baseline).</li>
-                                <li><strong>Multi-Topic:</strong> 10 Topics (2.3GB) & 128 Topics (29.4GB).</li>
-                            </ul>
-                        </li>
-                        <li><strong>Scale Out:</strong> 
-                            <ul>
-                                <li>Phase 1: 单节点 (112 Core) 基准测试。</li>
-                                <li>Phase 2: 扩展至 10+ 节点，模拟 1000 并发任务。</li>
-                            </ul>
-                        </li>
+                    <p><strong>POC Roadmap:</strong></p>
+                    <ul>
+                        <li><strong>Step 1:</strong> 集成 SDK，Bypass FUSE。</li>
+                        <li><strong>Step 2:</strong> 验证冷热读与多 Topic 场景。</li>
+                        <li><strong>Step 3:</strong> 扩展至 10+ 节点，1000 并发。</li>
                     </ul>
                 </div>
             </div>
@@ -341,58 +334,89 @@
                 <div class="mission-map" id="mission-list">
                     <div class="mission-card" id="m-card-1">
                         <div class="mission-icon"><i class="fas fa-plug"></i></div>
-                        <div>
-                            <div style="font-weight: bold; font-family: 'Bangers'; letter-spacing: 1px;">INTEGRATION</div>
-                            <div style="font-size: 0.8rem; color: #666;">Embed SDK, Remove FUSE</div>
-                        </div>
+                        <div><div style="font-weight: bold;">INTEGRATION</div><div style="font-size: 0.8rem;">Embed SDK</div></div>
                         <div class="check-mark" id="m-check-1"><i class="fas fa-check-circle"></i></div>
                     </div>
-
                     <div class="mission-card" id="m-card-2">
                         <div class="mission-icon"><i class="fas fa-thermometer-half"></i></div>
-                        <div>
-                            <div style="font-weight: bold; font-family: 'Bangers'; letter-spacing: 1px;">VALIDATION</div>
-                            <div style="font-size: 0.8rem; color: #666;">Cold/Hot Read (100GB+)</div>
-                        </div>
+                        <div><div style="font-weight: bold;">VALIDATION</div><div style="font-size: 0.8rem;">Scenario Test</div></div>
                         <div class="check-mark" id="m-check-2"><i class="fas fa-check-circle"></i></div>
                     </div>
-
                     <div class="mission-card" id="m-card-3">
                         <div class="mission-icon"><i class="fas fa-users"></i></div>
-                        <div>
-                            <div style="font-weight: bold; font-family: 'Bangers'; letter-spacing: 1px;">SCALE OUT</div>
-                            <div style="font-size: 0.8rem; color: #666;">1 -> 10+ Nodes (112 Cores)</div>
-                        </div>
+                        <div><div style="font-weight: bold;">SCALE OUT</div><div style="font-size: 0.8rem;">10+ Nodes</div></div>
                         <div class="check-mark" id="m-check-3"><i class="fas fa-check-circle"></i></div>
                     </div>
                 </div>
                 <div style="margin-top: 30px; text-align: center;">
-                    <button class="btn" style="background: var(--purple); color: white;" onclick="startMission()">🚀 启动 POC 计划</button>
+                    <button class="btn" style="background: var(--purple); color: white;" onclick="startMission()">🚀 启动 POC</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="section" style="padding-top: 0;">
-        <div style="background: var(--comic-white); border: var(--border); padding: 40px; border-radius: 20px; text-align: center; max-width: 800px; box-shadow: 10px 10px 0 rgba(0,0,0,0.5);">
-            <h2 class="comic-title">🏆 最终战报</h2>
-            <table style="width: 100%; border-collapse: collapse; margin-top: 20px; font-family: 'Noto Sans SC';">
-                <tr style="background: #eee;">
-                    <th style="padding: 10px; border: 1px solid #000;">维度</th>
-                    <th style="padding: 10px; border: 1px solid #000;">JFS (旧时代)</th>
-                    <th style="padding: 10px; border: 1px solid #000; color: var(--primary);">Alluxio (新时代)</th>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #000; font-weight: bold;">句柄占用</td>
-                    <td style="padding: 10px; border: 1px solid #000; color: var(--danger);">高 (~850)</td>
-                    <td style="padding: 10px; border: 1px solid #000; color: var(--success);">低 (< 200)</td>
-                </tr>
-                <tr>
-                    <td style="padding: 10px; border: 1px solid #000; font-weight: bold;">热读吞吐</td>
-                    <td style="padding: 10px; border: 1px solid #000;">221 MB/s</td>
-                    <td style="padding: 10px; border: 1px solid #000; color: var(--success); font-weight: bold;">280.7 MB/s</td>
-                </tr>
-            </table>
+    <div class="section">
+        <div class="comic-panel" style="border-color: #333; box-shadow: 15px 15px 0 #333;">
+            <div class="content-col">
+                <h2 class="comic-title" id="t6-title">📊 第六章：测试结论</h2>
+                
+                <div id="t6-story" class="fade-in">
+                    <div class="speech-bubble">
+                        <i class="fas fa-lightbulb"></i> <span style="font-weight:bold;">三大发现：</span>
+                    </div>
+                    <ul style="line-height: 1.8; list-style: none; padding: 0;">
+                        <li><i class="fas fa-check-circle text-success"></i> <strong>记性好就是快：</strong> 只要我看过一遍（热读），速度就能起飞。</li>
+                        <li><i class="fas fa-check-circle text-success"></i> <strong>猜你会读：</strong> 开启预读 (Prefetch)，速度直接翻倍！</li>
+                        <li><i class="fas fa-exclamation-circle text-accent"></i> <strong>挑食比较慢：</strong> 读一整本书很快；如果只要挑几页读，筛选过程会慢一些。</li>
+                    </ul>
+                    <div style="margin-top: 20px; font-weight: bold; color: var(--purple);">
+                        未来大招：<br>我正在学习“读心术” (Seek Preload)，你想翻哪页，我提前帮你备好！
+                    </div>
+                </div>
+
+                <div id="t6-tech" class="hidden fade-in">
+                    <p><strong>Test Analysis:</strong></p>
+                    <ul style="font-size: 0.9rem; line-height: 1.6;">
+                        <li><strong>Cache Benefit:</strong> 热读性能显著优于冷读，证明 Alluxio 缓存有效性。</li>
+                        <li><strong>Prefetch Impact:</strong> 开启 Prefetch 吞吐量提升近 2 倍 (<strong>10.19 MB/s -> 29.34 MB/s</strong>)。</li>
+                        <li><strong>Read Pattern:</strong> 顺序读取 (280 MB/s) 远快于多 Topic 筛选读取 (29 MB/s)，筛选有额外开销。</li>
+                    </ul>
+                    <p><strong>Optimization Plan:</strong></p>
+                    <p style="font-size: 0.9rem;">Client <code>seek()</code> 时触发 async preload。需研究 Access Pattern 决定是预加载全文件还是仅 Index/Meta。</p>
+                </div>
+            </div>
+
+            <div class="visual-col" style="background: #fff; display: flex; align-items: center; justify-content: center;">
+                <div class="insight-grid">
+                    <div class="insight-card">
+                        <div class="insight-icon text-primary"><i class="fas fa-forward"></i></div>
+                        <div class="insight-desc">Prefetch 开启后吞吐提升</div>
+                        <div class="insight-val">2x UP</div>
+                        <div class="insight-desc" style="font-size: 0.7rem;">(10.19 -> 29.34 MB/s)</div>
+                    </div>
+                    
+                    <div class="insight-card">
+                        <div class="insight-icon text-success"><i class="fas fa-fire"></i></div>
+                        <div class="insight-desc">单 Topic 热读吞吐</div>
+                        <div class="insight-val">280 MB/s</div>
+                        <div class="insight-desc" style="font-size: 0.7rem;">(远超冷读性能)</div>
+                    </div>
+
+                    <div class="insight-card">
+                        <div class="insight-icon text-accent"><i class="fas fa-filter"></i></div>
+                        <div class="insight-desc">多 Topic 筛选读取</div>
+                        <div class="insight-val">29 MB/s</div>
+                        <div class="insight-desc" style="font-size: 0.7rem;">(筛选开销较大)</div>
+                    </div>
+
+                    <div class="insight-card" style="border-color: var(--purple);">
+                        <div class="insight-icon text-purple"><i class="fas fa-brain"></i></div>
+                        <div class="insight-desc">冷读优化方向</div>
+                        <div class="insight-val" style="font-size: 1.2rem;">Seek Preload</div>
+                        <div class="insight-desc" style="font-size: 0.7rem;">(Trigger on seek)</div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -415,7 +439,8 @@
                 t2: ["😰 第二章：巨人手滑危机", "⚠️ Chap 2: Resource Constraints"],
                 t3: ["🚀 第三章：智能平板时代", "💻 Chap 3: SDK Integration"],
                 t4: ["⚔️ 第四章：终极对决", "📊 Chap 4: Benchmark Results"],
-                t5: ["🗺️ 第五章：宏伟蓝图", "🗓️ Chap 5: POC Roadmap"]
+                t5: ["🗺️ 第五章：宏伟蓝图", "🗓️ Chap 5: POC Roadmap"],
+                t6: ["📊 第六章：测试结论", "📝 Chap 6: Summary & Analysis"]
             };
             for (let k in titles) document.getElementById(k + '-title').innerText = m === 'story' ? titles[k][0] : titles[k][1];
             
@@ -434,13 +459,11 @@
             }
         }
 
-        // --- 动画逻辑 (简化版) ---
-        // 1. 架构
+        // --- 动画逻辑 ---
+        // 1. 架构 (Placeholder)
         function startArchAnim() {
             const el = document.getElementById('viz-arch');
-            el.innerHTML = '';
-            // 简单静态占位，实际动画见上一版完整代码 (为节省长度省略部分Canvas逻辑)
-            el.innerHTML = '<div style="font-weight:bold; margin-top:100px;">(Architecture Simulation Running...)</div>';
+            el.innerHTML = '<div style="position: absolute; bottom: 10px; font-weight: bold; background: white; padding: 5px 10px; border: 2px solid black;">Status: Idle</div>';
         }
 
         // 2. 加压
@@ -467,7 +490,7 @@
             }, 100);
         }
 
-        // 4. 宏伟蓝图 (Chapter 5)
+        // 4. 宏伟蓝图
         function startMission() {
             const steps = [1, 2, 3];
             steps.forEach((s, i) => {
